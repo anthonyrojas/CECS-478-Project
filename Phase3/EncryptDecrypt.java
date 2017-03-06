@@ -35,7 +35,7 @@ public class EncryptDecrypt {
 		JSONObject json = Encrypt(input, Public_Key_File);
 		String plainText = Decrypt(json, Private_Key_File);
 		
-		System.out.println(plainText);
+		System.out.println("Decrypted Text: " + plainText);
 	}
 	
 	/**
@@ -107,6 +107,10 @@ public class EncryptDecrypt {
 			
 			//print out jsonObject
 			System.out.println(jsonObject.toString());
+			System.out.println("AES Cipher Text: " + DatatypeConverter.printHexBinary(rsaCipherText));
+			System.out.println("AES IV: " + DatatypeConverter.printHexBinary(IV.getIV()));
+			System.out.println("RSA Cipher Text: " + DatatypeConverter.printHexBinary(rsaCipherText));
+			System.out.println("HMAC Tag: " + DatatypeConverter.printHexBinary(hmacTag));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
