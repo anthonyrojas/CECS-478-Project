@@ -1,9 +1,12 @@
 import java.io.*;
+import java.nio.file.*;
 import java.security.*;
-import java.util.Base64;
-
+import java.security.spec.*;
+import java.util.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
+import javax.xml.bind.DatatypeConverter;
+import org.json.*;
 
 /**
  * 
@@ -29,20 +32,7 @@ public class EncryptDecrypt {
 		 */
 		String input = "Text to be encrypted";
 		
-		PrivateKeyReader r = new PrivateKeyReader();
-		PublicKeyReader pr = new PublicKeyReader();
-		PrivateKey rsaPrivKey;
-		PublicKey rsaPubKey = null;
-		
-		//loads the private and public key
-		try {
-			rsaPubKey = pr.getPublicKey(Public_Key_File);
-			rsaPrivKey = r.getPrivateKey(Private_Key_File);
-		} catch (FileNotFoundException fnf){
-			System.out.println("File Not Found");
-		}
-		
-		byte[] cipher = Encrypt(input, rsaPubKey);
+		JSONObject json = Encrypt(input, Public_Key_File);
 	}
 	
 	/**
@@ -51,43 +41,72 @@ public class EncryptDecrypt {
 	 * @param pubKey - public rsakey
 	 * @return ciphertext
 	 */
-	public static byte[] Encrypt(String text, PublicKey pubKey) {
+	public static JSONObject Encrypt(String text, String file) {
 		
 		byte[] rsaCipherText = null;
 		byte[] aesCipherText = null;
+		byte[] hmacTag = null;
+		JSONObject jsonObject = new JSONObject();
 		
 		//generates the aes and hmac keys
 		try {
+			
+			//get public key from file and create rsa object
+			byte[] keyBytes = Files.readAllBytes(new File(file).toPath());
+			X509EncodedKeySpec rsaSpec = new X509EncodedKeySpec(keyBytes);
+			KeyFactory kf = KeyFactory.getInstance("RSA");
+			Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+			rsaCipher.init(Cipher.ENCRYPT_MODE, kf.generatePublic(rsaSpec));
+			
 			//Generate the aes key
 			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 			keyGen.init(256);
 			SecretKey aesKey = keyGen.generateKey();
-			//16 is the block size of the key
+			
+			//create the aes iv
 			byte[] iv = new byte[16];
 			SecureRandom rng = new SecureRandom();
 			rng.nextBytes(iv);
+			IvParameterSpec IV =  new IvParameterSpec(iv);
 			
-			//create cipher
+			//create aes cipher object
 			Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-			//encrypt the text in byte form
-			aesCipher.init(Cipher.ENCRYPT_MODE, aesKey, new IvParameterSpec(iv));
-			byte[] byteText = text.getBytes();
-			aesCipherText = aesCipher.doFinal(byteText);
+			aesCipher.init(Cipher.ENCRYPT_MODE, aesKey, IV);
+
+			
+			//encrypt the text with the aes key
+			aesCipherText = aesCipher.doFinal(text.getBytes());
 			//convert from binary to hex string
 			String aesText = Base64.getEncoder().encodeToString(aesCipherText);
-			//print out aes cipher text
-			System.out.println(aesText);
-			
-			//generate hmac 256-bit sha 256 key
-			//KeyGenerator keyGen2 = KeyGenerator.getInstance("HmacSHA256");
-			//keyGen2.init(256);
-			//SecretKey hmacKey = keyGen2.generateKey();
-			
+
+			//generate the HMACSha-256bit key
+			byte[] hmacArray = new byte[32];
+			rng.nextBytes(hmacArray);
 			Mac hmackey = Mac.getInstance("HmacSHA256");
-			SecretKeySpec secKey = new SecretKeySpec(pubKey.getEncoded(), "HmacSHA256");
-			hmackey.init(secKey);
-			String hmac = Base64.getEncoder().encodeToString(hmackey.doFinal(aesCipherText));
-			System.out.println(hmac);
+			SecretKeySpec hmacsecKey = new SecretKeySpec(hmacArray, "HmacSHA256");
+			hmackey.init(hmacsecKey);
+			hmacTag = hmackey.doFinal(aesCipherText);
+			String hmacFinal = Base64.getEncoder().encodeToString(hmacTag);
+			
+			//concatenate the aes and hmac keys
+			byte[] aesKeyByte = aesKey.getEncoded();
+			byte[] hmacKeyByte = hmacsecKey.getEncoded();
+			byte[] aeshmacKey = new byte[aesKeyByte.length + hmacKeyByte.length];
+			System.arraycopy(aesKeyByte, 0, aeshmacKey, 0, aesKeyByte.length);
+			System.arraycopy(hmacKeyByte, 0, aeshmacKey, aesKeyByte.length, aesKeyByte.length);
+			
+			//Encrypt concatenated keys
+			rsaCipherText = rsaCipher.doFinal(aeshmacKey);
+			
+			jsonObject.put("RSA CipherText", DatatypeConverter.printHexBinary(rsaCipherText));
+			jsonObject.put("AES CipherText", DatatypeConverter.printHexBinary(aesCipherText));
+			jsonObject.put("AES IV", DatatypeConverter.printHexBinary(IV.getIV()));
+			jsonObject.put("HMAC Tag", DatatypeConverter.printHexBinary(hmacTag));
+			
+			System.out.println("RSA CipherText: " + DatatypeConverter.printHexBinary(rsaCipherText));
+			System.out.println("AES CipherText: " + DatatypeConverter.printHexBinary(aesCipherText));
+			System.out.println("AES IV: " + DatatypeConverter.printHexBinary(IV.getIV()));
+			System.out.println("HMAC Tag: " + DatatypeConverter.printHexBinary(hmacTag));
 			
 		} catch (NoSuchAlgorithmException e) {
 			System.out.println("Algorithm not found");
@@ -101,7 +120,58 @@ public class EncryptDecrypt {
 			e.printStackTrace();
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
 		} 
-		return rsaCipherText;
+		return jsonObject;
+	}
+	
+	public static String Decrypt(JSONObject jsonObJect, String file) {
+		String plainText = null;
+		
+		try {
+			//Load Private Key
+			byte[] keyBytes = Files.readAllBytes(new File(file).toPath());
+			PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+			KeyFactory kf = KeyFactory.getInstance("RSA");
+			Cipher rsaCipher = Cipher.getInstance("RSA/ECB//OAEPWithSHA-256MGF1Padding");
+			rsaCipher.init(Cipher.DECRYPT_MODE, kf.generatePrivate(spec));
+			
+			//recover aesCipherText
+			//String aesFromJson = JSONObject.getString("AES CipherText");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return plainText;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
