@@ -22,7 +22,7 @@ module.exports = {
 			aesCipher : cipherText,
 			hmacTag : hmac.digest('hex')
 		};
-	}
+	},
 
 	decryption : function(jsonObj, key){
 		var rsaCipherText = jsonObj['rsaCipher'];
