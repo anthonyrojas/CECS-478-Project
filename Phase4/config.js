@@ -1,5 +1,4 @@
 module.exports = {
 	'secret': 'superSecret',
-	'database': 'mongodb://localhost:27017',
-	'port': process.env.PORT || 3000
+	'database': 'mongodb://noder:noderauth&54;proximus.modulusmongo.net:27017/so9pojyN'
 }
