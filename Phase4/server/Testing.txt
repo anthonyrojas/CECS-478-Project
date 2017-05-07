@@ -1,9 +1,5 @@
 478
 
-people us .js
-michael munoz
-oscar gotting
-
 "C:\Program Files\MongoDB\Server\3.4\bin"
 "C:\Users\Corey\Documents\School Stuff\CECS 478\saastutorial"
 mongod.exe --config mongod.cfg --install
