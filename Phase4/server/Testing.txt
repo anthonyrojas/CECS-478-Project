@@ -1,0 +1,28 @@
+478
+
+people us .js
+michael munoz
+oscar gotting
+
+"C:\Program Files\MongoDB\Server\3.4\bin"
+"C:\Users\Corey\Documents\School Stuff\CECS 478\saastutorial"
+mongod.exe --config mongod.cfg --install
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
+
+Corey Rau
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTBmNzQzODE3NWRiNjJkM2NkZjQ5NTAiLCJmaXJzdE5hbWUiOiJDb3JleSIsImxhc3ROYW1lIjoiUmF1IiwiZW1haWwiOiJjcmF1MTAxMkBnbWFpbC5jb20iLCJyb2xlIjoiTWVtYmVyIiwiaWF0IjoxNDk0MTg1MDE2LCJleHAiOjE0OTQxOTUwOTZ9.ThP6jwqQAo59442_JlWUPWN6p3qcH0tphMMTNvfQfwM
+590f7438175db62d3cdf4950
+convo id 590f8476dbcdd51c5470cd6e
+Test
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTBmNzk0ZmU5MWEyNzEwMzhkN2VhZTciLCJmaXJzdE5hbWUiOiJmaXJzdE5hbWUiLCJsYXN0TmFtZSI6Imxhc3ROYW1lIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE0OTQxODYzMjAsImV4cCI6MTQ5NDE5NjQwMH0.v6MaT-FG1AsqnHHKr3JpR96ZLNqenR9wUQad29aA2ew
+590f794fe91a271038d7eae7
+Test2
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTBmN2FlYzIwNWMyZTEwYjAyMTZkNjMiLCJmaXJzdE5hbWUiOiJmaXJzdE5hbWUyIiwibGFzdE5hbWUiOiJsYXN0TmFtZTIiLCJlbWFpbCI6InRlc3QyQGdtYWlsLmNvbSIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE0OTQxODY3MzIsImV4cCI6MTQ5NDE5NjgxMn0.RdLE9l8JW6-RON6NQSBkPYcv7_5-BuQycU2-qLpmaH0
+
+POST http://localhost:3000/api/register works
+
+POST http://localhost:3000/api/auth/login works
+
+POST http://localhost:3000/api/chat/new/"userid" works
+
+GET http://localhost:3000/api/chat works
