@@ -1,12 +1,12 @@
 // Importing Node modules and initializing Express
-const express = require('express'),  
-      app = express(),
-	  bodyParser = require('body-parser'),
-      logger = require('morgan'),
-      mongoose = require('mongoose'),
-      config = require('./config/main'),
-	  socketEvents = require('./socketEvents'),
-	  router = require('./router');  
+const   express = require('express'),  
+        app = express(),
+	bodyParser = require('body-parser'),
+        logger = require('morgan'),
+        mongoose = require('mongoose'),
+        config = require('./config/main'),
+	socketEvents = require('./socketEvents'),
+	router = require('./router');  
 
 	  
 // Start the server
