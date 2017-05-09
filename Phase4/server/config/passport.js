@@ -5,10 +5,8 @@ const passport = require('passport'),
       JwtStrategy = require('passport-jwt').Strategy,
       ExtractJwt = require('passport-jwt').ExtractJwt,
       LocalStrategy = require('passport-local');
-	  
-	  
-const localOptions = { usernameField: 'email' };  
 
+const localOptions = { usernameField: 'email' };  
 
 // Setting up local login strategy
 const localLogin = new LocalStrategy(localOptions, function(email, password, done) {  
@@ -19,7 +17,6 @@ const localLogin = new LocalStrategy(localOptions, function(email, password, don
     user.comparePassword(password, function(err, isMatch) {
       if (err) { return done(err); }
       if (!isMatch) { return done(null, false, { error: "Your login details could not be verified. Please try again." }); }
-
       return done(null, user);
     });
   });
