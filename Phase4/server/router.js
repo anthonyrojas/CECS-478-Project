@@ -17,8 +17,6 @@ module.exports = function(app) {
   //=========================
   // Auth Routes
   //=========================
-  
-
   // Set auth routes as subgroup/middleware to apiRoutes
   apiRoutes.use('/auth', authRoutes);
 
