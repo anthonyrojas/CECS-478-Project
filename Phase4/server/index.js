@@ -8,7 +8,6 @@ const   express = require('express'),
 	socketEvents = require('./socketEvents'),
 	router = require('./router');  
 
-	  
 // Start the server
 const server = app.listen(config.port);  
 console.log('Your server is running on port ' + config.port + '.');
@@ -21,7 +20,6 @@ mongoose.connect(config.database);
 
 // Setting up basic middleware for all Express requests
 app.use(logger('dev')); // Log requests to API using morgan
-
 app.use(bodyParser.urlencoded({ extended: false }));  
 app.use(bodyParser.json());  
 
