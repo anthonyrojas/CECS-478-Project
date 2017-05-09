@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken'),
 	  
 function generateToken(user) {  
   return jwt.sign(user, config.secret, {
-    expiresIn: 10080 // in seconds
+    expiresIn: 10800 // in seconds
   });
 }
 
@@ -77,13 +77,9 @@ exports.register = function(req, res, next) {
       });
 
       user.save(function(err, user) {
-        if (err) { return next(err); }
-
-        // Subscribe member to Mailchimp list
-        // mailchimp.subscribeToNewsletter(user.email);
+        if (err) { return next(err);
 
         // Respond with JWT if user was created
-
         let userInfo = setUserInfo(user);
 
         res.status(201).json({
