@@ -2,7 +2,6 @@ const mongoose = require('mongoose'),
       Schema = mongoose.Schema,
       bcrypt = require('bcrypt-nodejs');
 	  
-	  
 //================================
 // User Schema
 //================================
@@ -40,7 +39,7 @@ const UserSchema = new Schema({
 // Pre-save of user to database, hash password if password is modified or new
 UserSchema.pre('save', function(next) {  
   const user = this,
-        SALT_FACTOR = 5;
+        SALT_FACTOR = 10;
 
   if (!user.isModified('password')) return next();
 
